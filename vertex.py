@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-class Vertex:
+class Vertex(object):
     def __init__(self):
         self._score = 0
         self._oldScore = float('infinity')
