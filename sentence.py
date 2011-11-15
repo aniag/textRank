@@ -12,7 +12,8 @@ class Sentence(object):
         self._score = 0
         
     def addWord(self, word):
-        self._bow.append(word)
+        if word not in self._bow:
+            self._bow.append(word)
     
     def getWords(self):
         return self._bow
