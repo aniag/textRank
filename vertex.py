@@ -18,8 +18,10 @@ class Vertex(object):
         return abs(self._score - self._oldScore)
     
     def setScore(self, s):
-        if self._score is not None: self._oldScore = self._score
         self._score = s
+
+    def ageScore(self):
+        if self._score is not None: self._oldScore = self._score
         
     def setOldScore(self, s):
         self._oldScore = s

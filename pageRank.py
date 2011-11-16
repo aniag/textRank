@@ -14,11 +14,13 @@ class PageRank(object):
 
     def pageRankIteration(self):
         for vrtx in self._vertices:
+            vrtx.ageScore()
+        for vrtx in self._vertices:
             score = 0
             for neighbour in vrtx.getNeighbours():
                 if(self._edges[(vrtx, neighbour)] != 0):
                     score += neighbour.getOldScore() * self._edges[(vrtx, neighbour)] * 1./neighbour.getOutSum()
-            vrtx.setScore(self._d + (1-self._d)*score)
+            vrtx.setScore(self._d*1./len(self._vertices) + (1-self._d)*score)
             
     def addEdge(self, v, w, weight):
         if (v, w) not in self._edges:
