@@ -24,6 +24,9 @@ class Sentence(object):
     def getOrdinalNumber(self):
         return self._ordinalNumber
         
+    def getOriginalSentence(self):
+        return self._originalSentence
+        
     def incScore(self, x):
         self._score += x*1./len(self._bow)
         

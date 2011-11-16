@@ -3,8 +3,8 @@
 
 class Vertex(object):
     def __init__(self):
-        self._score = 0
-        self._oldScore = float('infinity')
+        self._score = None
+        self._oldScore = 0
         self._neighbours = []
     
     def getScore(self):
@@ -14,11 +14,15 @@ class Vertex(object):
         return self._oldScore
         
     def getDiff(self):
+        if self._score is None: return float('infinity')
         return abs(self._score - self._oldScore)
     
     def setScore(self, s):
-        self._oldScore = self._score
+        if self._score is not None: self._oldScore = self._score
         self._score = s
+        
+    def setOldScore(self, s):
+        self._oldScore = s
     
     def getOutSum(self):
         return len(self._neighbours)
@@ -45,6 +49,7 @@ class SentenceVertex(Vertex):
         assert(isinstance(sent, sentence.Sentence))
         self._sentence = sent
         self._ordinalNumber = ordNumb
+        self._outSum = 0
         
     def getSentence(self):
         return self._sentence
@@ -54,3 +59,9 @@ class SentenceVertex(Vertex):
     
     def getOrdinalNumber(self):
         return self._ordinalNumber
+        
+    def getOutSum(self):
+        return self._outSum
+        
+    def incOutSum(self, val):
+        self._outSum += val

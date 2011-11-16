@@ -5,16 +5,19 @@
 
 class PageRank(object):
 
-    def __init__(self, vertices = [], edges = {}, d = 0.1):
+    def __init__(self, vertices = [], edges = {}, d = 0.05):
         self._vertices = vertices
         self._edges = edges
         self._d = d
+        self._vertices[0].setOldScore(1)
+        self._vertices[0].setScore(1)
 
     def pageRankIteration(self):
-        for vrtx in self.vertices:
+        for vrtx in self._vertices:
             score = 0
             for neighbour in vrtx.getNeighbours():
-                score += neighbour.getOldScore() * self.edges[(vrtx, neighbour)] * 1./neighbour.getOutSum()
+                if(self._edges[(vrtx, neighbour)] != 0):
+                    score += neighbour.getOldScore() * self._edges[(vrtx, neighbour)] * 1./neighbour.getOutSum()
             vrtx.setScore(self._d + (1-self._d)*score)
             
     def addEdge(self, v, w, weight):
@@ -24,7 +27,7 @@ class PageRank(object):
         else: assert(self._edges[(v, w)] == weight)
         
     def checkConvergence(self, threshold):
-        for vertex is self._vertices:
+        for vertex in self._vertices:
             if vertex.getDiff() > threshold:
                 return False
         return True
