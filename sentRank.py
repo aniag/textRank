@@ -26,6 +26,7 @@ def prepareGraph(source, morfo, POS, vertices, edges):
         for u in vertices:
             # edges[(v, u)] = edges[(u, v)] = similarity(sent, u.getSentence())
             v.addNeighbour(u)
+            u.addNeighbour(v)
             edges[(v, u)] = edges[(u, v)] = len([w for w in sent.getWords() if w in u.getSentence().getWords()]) * 1. / (math.log(len(sent.getWords())) + math.log(len(u.getSentence().getWords())))
             v.incOutSum(edges[(v, u)])
             u.incOutSum(edges[(v, u)])
