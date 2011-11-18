@@ -40,6 +40,7 @@ def algorithm(source, morfo, POS, threshold):
     prepareGraph(source, morfo, POS, vertices, edges)    
     pr = pageRank.PageRank(vertices, edges)
     while not pr.checkConvergence(threshold): pr.pageRankIteration()
+    vertices.sort(key=lambda v: v.getScore(), reverse=True)
     return vertices
     
 #def main():
