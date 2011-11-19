@@ -40,11 +40,12 @@ def algorithm(source, morfo, POS, threshold):
     prepareGraph(source, morfo, POS, vertices, edges)    
     pr = pageRank.PageRank(vertices, edges)
     while not pr.checkConvergence(threshold): pr.pageRankIteration()
-    vertices.sort(key=lambda v: v.getScore(), reverse=True)
-    return vertices
+    # vertices.sort(key=lambda v: v.getScore(), reverse=True)
+    return dict([(v.getSentence().getOrdinalNumber(), v.getScore()) for v in vertices])
     
 #def main():
     
 
-#if __name__ == '__main__':
-#    main()    
+if __name__ == '__main__':
+    morfo = morfeuszDB4GUI.MorfeuszDB4GUI('/home/aglazek/mgr/morfeusz')
+    print algorithm('/home/aglazek/private/teksty/czekan.txt', morfo, ['noun', 'verb', 'adjective'], 0.01)

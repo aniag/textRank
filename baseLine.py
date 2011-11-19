@@ -61,3 +61,10 @@ def doAll(mdb, txt, numb):
     b.countStats()
     b.rankSentences()
     for s in b.getExtract(numb): print s
+    
+if __name__ == '__main__':
+    b = baseLineExtract('/home/aglazek/mgr/morfeusz', '/home/aglazek/private/teksty/czekan.txt')
+    b.countStats()
+    print ''
+    print b.rankSentences()
+    

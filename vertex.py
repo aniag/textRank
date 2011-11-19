@@ -6,6 +6,7 @@ class Vertex(object):
         self._score = None
         self._oldScore = 0
         self._neighbours = []
+        self._outSum = 0
     
     def getScore(self):
         return self._score
@@ -27,13 +28,17 @@ class Vertex(object):
         self._oldScore = s
     
     def getOutSum(self):
-        return len(self._neighbours)
+        return self._outSum
+        # return len(self._neighbours)
     
     def getNeighbours(self):
         return self._neighbours
     
     def addNeighbour(self, v):
         self._neighbours.append(v)
+        
+    def incOutSum(self, val):
+        self._outSum += val
         
 class WordVertex(Vertex):
     def __init__(self, base):
@@ -64,6 +69,3 @@ class SentenceVertex(Vertex):
         
     def getOutSum(self):
         return self._outSum
-        
-    def incOutSum(self, val):
-        self._outSum += val
