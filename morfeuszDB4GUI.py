@@ -94,6 +94,13 @@ class MorfeuszDB4GUI:
         if 'stopword' in res: return True
         return False
         
+    def getRelated(self, word):
+        try:
+            w = word.decode('utf-8')
+        except UnicodeEncodeError:
+            w = word
+        return self._c.execute("select word2 from related where word1 = '"+w+"';").fetchall()
+        
     def lookUpWord(self, word):
         try:
             w = word.decode('utf-8')
