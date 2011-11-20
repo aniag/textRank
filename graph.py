@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+
 class Graph(object):
     def __init__(self):
         self._vertices = []
@@ -19,8 +20,20 @@ class Graph(object):
     def getEdges(self):
         return self._edges
 
-#class GraphOfSentences(Graph):
-            
+class GraphOfSentences(Graph):
+    
+    def _init_(self):
+        Graph.__init__(self)
+             
+    def update(self, v):
+        for u in self._vertices:
+            v.addNeighbour(u)
+            u.addNeighbour(v)
+            w = u.similarity(v)
+            self.addEdge(u, v, w)
+            v.incOutSum(w)
+            u.incOutSum(w)
+        self.addVertex(v)
         
 class GraphOfWords(Graph):
 

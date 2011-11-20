@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import re, math, string
+import re, string
 import sentence
 import morfeuszDB4GUI
 import operator

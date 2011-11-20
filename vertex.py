@@ -1,6 +1,8 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import math
+
 class Vertex(object):
     def __init__(self):
         self._score = None
@@ -60,6 +62,9 @@ class SentenceVertex(Vertex):
         
     def getSentence(self):
         return self._sentence
+        
+    def similarity(self, s):
+        return len([w for w in self.getSentence().getWords() if w in s.getSentence().getWords()]) * 1. / (math.log(len(self.getSentence().getWords())) + math.log(len(s.getSentence().getWords())))
         
     def getBaseSentence(self):
         return self._sentence._baseSentence
