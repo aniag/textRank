@@ -14,6 +14,7 @@ class Graph(object):
         return self._vertices
         
     def addEdge(self, v1, v2, weight):
+        if (v1, v2) in self._edges: weight += self._edges[(v1, v2)]
         self._edges[(v1,v2)] = weight
         self._edges[(v2,v1)] = weight
     

@@ -37,5 +37,6 @@ def algorithm(source, morfo, POS, threshold):
     
 
 if __name__ == '__main__':
-    morfo = morfeuszDB4GUI.MorfeuszDB4GUI('/home/aglazek/mgr/morfeusz')
+    #morfo = morfeuszDB4GUI.MorfeuszDB4GUI('/home/aglazek/mgr/morfeusz')
+    morfo = morfeuszDB4GUI.MorfeuszDB4GUI('/home/aglazek/private/relacje_rozne/word_relations')
     print algorithm('/home/aglazek/private/teksty/czekan.txt', morfo, ['noun', 'verb', 'adjective', 'unknown'], 0.01)

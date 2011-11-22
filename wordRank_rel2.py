@@ -22,10 +22,14 @@ def prepareGraph(source, morfo, POS, wgraph, base2vert, sentences):
             dummy = morfo.lookUpWord(w)
             if 'stopword' in [p for (b, p) in dummy]: continue
             sent.addWord(w)
+            related = morfo.getRelated([b for (b, p) in dummy])
             for (base, pos) in dummy:            
                 if pos in POS : 
                     if base not in base2vert: base2vert[base] = vertex.WordVertex(base)
                     vertBucket.append(base2vert[base])
+            for form in related:
+                if form not in base2vert: base2vert[form] = vertex.WordVertex(form)
+                vertBucket.append(base2vert[form])
             wgraph.addToWindow(vertBucket)
             wgraph.update()
         sentences.append(sent)

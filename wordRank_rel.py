@@ -50,6 +50,17 @@ def algorithm(source, morfo, POS, w_size, threshold):
     sentences = []
     prepareGraph(source, morfo, POS, wgraph, base2vert, sentences)    
     #print wgraph.getVertices()
+    for b in base2vert:
+        for w in morfo.getRelated(b):
+            if w in base2vert:
+                #print b, w
+                vb = base2vert[b]
+                vw = base2vert[w]
+                wgraph.addEdge(vb, vw, 5)
+                vb.addNeighbour(vw)
+                vb.incOutSum(5)
+                vw.addNeighbour(vb)
+                vw.incOutSum(5)
     pr = pageRank.PageRank(wgraph.getVertices(), wgraph.getEdges())
     while not pr.checkConvergence(threshold): pr.pageRankIteration()
     return rankSentences(morfo, POS, sentences, base2vert)
