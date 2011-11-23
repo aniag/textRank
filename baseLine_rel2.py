@@ -34,6 +34,11 @@ class baseLineExtract(object):
                     if base not in self.words:
                         self.words[base] = 0
                     self.words[base] += 1  
+                related = self.morfo.getRelated([b for (b, p) in dummy])
+                for form in related:
+                    if form not in self.words:
+                        self.words[form] = 0
+                    self.words[form] += 1  
             i+=1  
         src.close()
                 
