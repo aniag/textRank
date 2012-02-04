@@ -27,6 +27,9 @@ class Sentence(object):
     def getOriginalSentence(self):
         return self._originalSentence
         
+    def setScore(self, s):
+        self._score = s
+        
     def incScore(self, x):
         self._score += x*1./len(self._bow)
         
