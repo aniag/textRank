@@ -8,6 +8,15 @@ class Sentence(object):
         self._originalSentence = sent
         self._ordinalNumber = nb
         self._tokenizedSentence = re.sub('['+string.punctuation+']', ' ', sent).lower().split()
+    
+    def getOriginalSentence(self):
+        return self._originalSentence
+        
+    def getOrdinalNumber(self):
+        return self._ordinalNumber
+        
+    def getTokens(self):
+        return self._tokenizedSentence
         
 class DocumentObject(object):
     def __init__(self, textFile):
@@ -30,6 +39,6 @@ class DocumentObject(object):
     def getSentences(self):
         return self._sentences
     
-    def getSentenct(self, nb):
+    def getSentence(self, nb):
         return self._sentences[nb]
         
