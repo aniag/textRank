@@ -3,17 +3,6 @@ import rank_method
 
 class StatisticMethod(rank_method.RankMethod):
 
-    def relatedWords(self, word):
-        considered = set([word])
-        if self._use_morfo:
-            considered.update(set(self._morfo.getBasesLists(word.encode('utf8'))[0]))
-            # print self._morfo.getBasesLists(word.encode('utf8'))[0]
-        if self._use_thes:
-            considered.update(set(self._thes.lookUpWord(word)))
-        if self._use_rel:
-            considered.update(set(self._rel.lookUpWord(word)))
-        return considered
-
     def countStats(self, text):
         for sent in text.getSentences():
             for word in sent.getTokens():

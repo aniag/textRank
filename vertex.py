@@ -51,27 +51,30 @@ class WordVertex(Vertex):
     def getBaseWord(self):
         return self._baseWord
         
-import sentence
+import source_document
 
 class SentenceVertex(Vertex):
-    def __init__(self, sent, ordNumb):
+    def __init__(self, sent):
         Vertex.__init__(self)
-        assert(isinstance(sent, sentence.Sentence))
+        assert(isinstance(sent, source_document.Sentence))
+        self._bow = set([])
         self._sentence = sent
-        self._ordinalNumber = ordNumb
         self._outSum = 0
         
     def getSentence(self):
         return self._sentence
         
     def similarity(self, s):
-        return len([w for w in self.getSentence().getWords() if w in s.getSentence().getWords()]) * 1. / (math.log(len(self.getSentence().getWords())) + math.log(len(s.getSentence().getWords())))
+        return len([w for w in self.getAllWords() if w in s.getAllWords()]) * 1. / (math.log(len(self.getAllWords())) + math.log(len(s.getAllWords())))
         
-    def getBaseSentence(self):
-        return self._sentence._baseSentence
-    
+    def getAllWords(self):
+        return self._bow
+            
+    def addWords(self, wordList):
+        self._bow.update(set(wordList))
+            
     def getOrdinalNumber(self):
-        return self._ordinalNumber
+        return self._sentence.getOrdinalNumber()
         
     def getOutSum(self):
         return self._outSum

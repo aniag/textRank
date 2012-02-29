@@ -25,4 +25,19 @@ class RankMethod(object):
             self._rel = related_words.RelatedWords(relData)
             self._use_rel = True
         
-    
+    def relatedWords(self, word):
+        considered = set([word])
+        if self._use_morfo:
+            considered.update(set(self._morfo.getBasesLists(word.encode('utf8'))[0]))
+            # print self._morfo.getBasesLists(word.encode('utf8'))[0]
+        if self._use_thes:
+            if self._use_morfo: 
+                for b in self._morfo.getBasesLists(word.encode('utf8'))[0]:
+                    considered.update(set(self._thes.lookUpWord(b)))
+            else: considered.update(set(self._thes.lookUpWord(word)))
+        if self._use_rel:
+            if self._use_morfo: 
+                for b in self._morfo.getBasesLists(word.encode('utf8'))[0]:
+                    considered.update(set(self._rel.lookUpWord(b)))
+            else: considered.update(set(self._rel.lookUpWord(word)))
+        return considered

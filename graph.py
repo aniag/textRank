@@ -47,9 +47,9 @@ class GraphOfWords(Graph):
         for i in range(self._windowSize - 1):
             self._window[i] = self._window[i+1]
         
-    def addToWindow(self, vertList):
+    def addToWindow(self, vSet):
         self.moveWindow()
-        self._window[-1] = vertList
+        self._window[-1] = vSet
     
     def update(self):
         for vrx in self._window[-1]:
@@ -62,5 +62,5 @@ class GraphOfWords(Graph):
                     pred.addNeighbour(vrx)
                     vrx.incOutSum(w)
                     pred.incOutSum(w)
-                #TODO: dodać krawędzie i sąsiadów
+                #TODO: sprawdzić czy to zostało zrobione: dodać krawędzie i sąsiadów
 
