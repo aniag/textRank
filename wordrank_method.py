@@ -12,6 +12,7 @@ class WordRankMethod(rank_method.RankMethod):
                 for form in self.relatedWords(word):
                     if form not in self._word2vert: self._word2vert[form] = vertex.WordVertex(form)
                     vBucket.append(self._word2vert[form])
+                if len(vBucket) == 0: continue
                 self._graph.addToWindow(vBucket)
                 self._graph.update()
 
