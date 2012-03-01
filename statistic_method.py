@@ -22,7 +22,8 @@ class StatisticMethod(rank_method.RankMethod):
             for word in sent.getTokens():
                 if self._use_stopwords and self._stopwords.isStopWord(word.encode('utf8')): continue
                 related = self.relatedWords(word)
-                rank[sent.getOrdinalNumber()] += max([score for (base, score) in self.words.items() if base in related])*1./len(sent.getTokens())
+                if len(related) > 0:
+                    rank[sent.getOrdinalNumber()] += max([score for (base, score) in self.words.items() if base in related])*1./len(sent.getTokens())
             denom += rank[sent.getOrdinalNumber()]
         for i in rank: rank[i] /= denom
         return rank

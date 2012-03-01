@@ -29,7 +29,8 @@ class WordRankMethod(rank_method.RankMethod):
             for w in sent.getTokens():
                 if self._use_stopwords and self._stopwords.isStopWord(word.encode('utf8')): continue
                 related = self.relatedWords(w)
-                rank[sent.getOrdinalNumber()] += max([self._word2vert[word].getScore() for word in related])*1./len(sent.getTokens())
+                if len(related) > 0:
+                    rank[sent.getOrdinalNumber()] += max([self._word2vert[word].getScore() for word in related])*1./len(sent.getTokens())
             denom += rank[sent.getOrdinalNumber()]
         for i in rank: rank[i] /= denom
         return rank
