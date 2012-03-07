@@ -19,18 +19,25 @@ class Sentence(object):
         return self._tokenizedSentence
         
 class DocumentObject(object):
-    def __init__(self, textFile):
-        self._sourcePath = textFile
+    def __init__(self, source):
         self._sentences = []
-        self.prepare_text()
-    
-    def prepare_text(self):
-        source = codecs.open(self._sourcePath, mode='r', encoding='utf8')
+        if isinstance(source, list):
+            self.text_from_list(source)
+        else:
+            self._sourcePath = source
+            self.prepare_text()
+        
+    def text_from_list(self, source):
         i = 0
         for line in source:
             if i == 0: self._title = line.strip()
             else: self._sentences.append(Sentence(line.strip(), i-1))
             i += 1
+    
+    def prepare_text(self):
+        source = codecs.open(self._sourcePath, mode='r', encoding='utf8')
+        i = 0
+        self.text_from_list(source)
         source.close()
         
     def getTitle(self):

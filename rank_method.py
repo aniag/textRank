@@ -1,3 +1,6 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
 import agl_morfeusz
 import stopwords
 import related_words

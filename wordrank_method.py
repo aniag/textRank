@@ -27,7 +27,7 @@ class WordRankMethod(rank_method.RankMethod):
         for sent in text.getSentences():
             rank[sent.getOrdinalNumber()] = 0
             for w in sent.getTokens():
-                if self._use_stopwords and self._stopwords.isStopWord(word.encode('utf8')): continue
+                if self._use_stopwords and self._stopwords.isStopWord(w.encode('utf8')): continue
                 related = self.relatedWords(w)
                 if len(related) > 0:
                     rank[sent.getOrdinalNumber()] += max([self._word2vert[word].getScore() for word in related])*1./len(sent.getTokens())
