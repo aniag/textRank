@@ -78,5 +78,6 @@ if __name__ == '__main__':
     for tid in texts:
         rankings[(tid, 'x-tractor')] = count_ranking_for_text(tid)
         for xt in extractors:
+            print tid, xt
             rankings[(tid, xt)] = extractors[xt].rankSentences(texts[tid])
     print rankings
