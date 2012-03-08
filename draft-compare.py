@@ -3,6 +3,7 @@
 
 import json
 import urllib
+import math
 import source_document
 import rank_method
 import random_method
@@ -17,6 +18,7 @@ importance = {}
 texts = {}
 extractors = {}
 rankings = {}
+distances = {}
 
 
 def count_importances(url):
@@ -76,8 +78,18 @@ if __name__ == '__main__':
     load_texts('http://localhost:8080/main/')
     create_extractors('/home/aglazek/private/praca/lang_data/thesaurus-utf8.txt', '/home/aglazek/private/praca/lang_data/related_words.txt', '/home/aglazek/private/praca/lang_data/combined_stopwords.txt')
     for tid in texts:
+        ln = len(texts[tid].getSentences())
         rankings[(tid, 'x-tractor')] = count_ranking_for_text(tid)
         for xt in extractors:
             print tid, xt
+            dist = 0
             rankings[(tid, xt)] = extractors[xt].rankSentences(texts[tid])
+            for i in range(ln):
+                if i not in rankings[(tid, xt)]: a = 0
+                else: a = rankings[(tid, xt)][i]
+                if i not in rankings[(tid, 'x-tractor')]: b = 0
+                else: b = rankings[(tid, 'x-tractor')][i]
+                dist += pow((a-b), 2)
+            distances[(tid, xt)]= math.sqrt(dist)
     print rankings
+    print distances
