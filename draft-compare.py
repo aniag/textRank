@@ -19,11 +19,11 @@ texts = {}
 extractors = {}
 rankings = {}
 distances = {}
+avg_dists = {}
 
 
 def count_importances(url):
 
-    # TODO: zmienić adres na zew.
     selections = json.loads(urllib.urlopen(url+"results").read())
     for tid in selections:
         denominators[int(tid)] = 0
@@ -36,8 +36,9 @@ def count_importances(url):
               
     #print denominators
     #print importance
-    
-def create_extractors(_thesData, _relData, _stopWordsData):
+
+#TODO: metody z POSami
+def create_extractors(_thesData, _relData, _stopWordsData, _pos):
     extractors['random'] = random_method.RandomMethod()
     extractors['ordinal'] = ordinal_method.OrdinalMethod()
     extractors['statistic'] = statistic_method.StatisticMethod()
@@ -46,18 +47,21 @@ def create_extractors(_thesData, _relData, _stopWordsData):
     extractors['statistic+morfo+thes+sw'] = statistic_method.StatisticMethod(morfo = True, thesData = _thesData, stopWordsData = _stopWordsData)
     extractors['statistic+morfo+rel+sw'] = statistic_method.StatisticMethod(morfo = True, relData = _relData, stopWordsData = _stopWordsData)
     extractors['statistic+morfo+thes+rel+sw'] = statistic_method.StatisticMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['statistic+morfo:nouns+thes+rel+sw'] = statistic_method.StatisticMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
     extractors['wordrank'] = wordrank_method.WordRankMethod()
     extractors['wordrank+sw'] = wordrank_method.WordRankMethod(stopWordsData = _stopWordsData)
     extractors['wordrank+morfo+sw'] = wordrank_method.WordRankMethod(morfo = True, stopWordsData = _stopWordsData)
     extractors['wordrank+morfo+thes+sw'] = wordrank_method.WordRankMethod(morfo = True, thesData = _thesData, stopWordsData = _stopWordsData)
     extractors['wordrank+morfo+rel+sw'] = wordrank_method.WordRankMethod(morfo = True, relData = _relData, stopWordsData = _stopWordsData)
     extractors['wordrank+morfo+thes+rel+sw'] = wordrank_method.WordRankMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['wordrank+morfo:nouns+thes+rel+sw'] = wordrank_method.WordRankMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
     extractors['sentencerank'] = sentencerank_method.SentenceRankMethod()
     extractors['sentencerank+sw'] = sentencerank_method.SentenceRankMethod(stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+thes+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, thesData = _thesData, stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, relData = _relData, stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+thes+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['sentencerank+morfo:nouns+thes+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
     
 
 def load_texts(url):
@@ -74,9 +78,9 @@ def count_ranking_for_text(text_id):
     return rank
 
 if __name__ == '__main__':
-    count_importances('http://localhost:8080/main/')
-    load_texts('http://localhost:8080/main/')
-    create_extractors('/home/aglazek/private/praca/lang_data/thesaurus-utf8.txt', '/home/aglazek/private/praca/lang_data/related_words.txt', '/home/aglazek/private/praca/lang_data/combined_stopwords.txt')
+    count_importances('http://localhost:9999/main/')
+    load_texts('http://localhost:9999/main/')
+    create_extractors('/home/aglazek/private/praca/lang_data/thesaurus-utf8.txt', '/home/aglazek/private/praca/lang_data/related_words.txt', '/home/aglazek/private/praca/lang_data/combined_stopwords.txt', ['noun'])
     for tid in texts:
         ln = len(texts[tid].getSentences())
         rankings[(tid, 'x-tractor')] = count_ranking_for_text(tid)
@@ -91,5 +95,9 @@ if __name__ == '__main__':
                 else: b = rankings[(tid, 'x-tractor')][i]
                 dist += pow((a-b), 2)
             distances[(tid, xt)]= math.sqrt(dist)
+    for xt in extractors:
+        d = [distances[(tid, xt)] for tid in texts]
+        avg_dists[xt] = sum(d)/len(d)
     print rankings
     print distances
+    print avg_dists
