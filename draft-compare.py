@@ -44,6 +44,7 @@ def create_extractors(_thesData, _relData, _stopWordsData, _pos):
     extractors['statistic'] = statistic_method.StatisticMethod()
     extractors['statistic+sw'] = statistic_method.StatisticMethod(stopWordsData = _stopWordsData)
     extractors['statistic+morfo+sw'] = statistic_method.StatisticMethod(morfo = True, stopWordsData = _stopWordsData)
+    extractors['statistic+morfo:noun+sw'] = statistic_method.StatisticMethod(morfo = True, stopWordsData = _stopWordsData, pos = _pos)
     extractors['statistic+morfo+thes+sw'] = statistic_method.StatisticMethod(morfo = True, thesData = _thesData, stopWordsData = _stopWordsData)
     extractors['statistic+morfo+rel+sw'] = statistic_method.StatisticMethod(morfo = True, relData = _relData, stopWordsData = _stopWordsData)
     extractors['statistic+morfo+thes+rel+sw'] = statistic_method.StatisticMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
@@ -51,6 +52,7 @@ def create_extractors(_thesData, _relData, _stopWordsData, _pos):
     extractors['wordrank'] = wordrank_method.WordRankMethod()
     extractors['wordrank+sw'] = wordrank_method.WordRankMethod(stopWordsData = _stopWordsData)
     extractors['wordrank+morfo+sw'] = wordrank_method.WordRankMethod(morfo = True, stopWordsData = _stopWordsData)
+    extractors['wordrank+morfo:noun+sw'] = wordrank_method.WordRankMethod(morfo = True, stopWordsData = _stopWordsData, pos = _pos)
     extractors['wordrank+morfo+thes+sw'] = wordrank_method.WordRankMethod(morfo = True, thesData = _thesData, stopWordsData = _stopWordsData)
     extractors['wordrank+morfo+rel+sw'] = wordrank_method.WordRankMethod(morfo = True, relData = _relData, stopWordsData = _stopWordsData)
     extractors['wordrank+morfo+thes+rel+sw'] = wordrank_method.WordRankMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
@@ -58,6 +60,7 @@ def create_extractors(_thesData, _relData, _stopWordsData, _pos):
     extractors['sentencerank'] = sentencerank_method.SentenceRankMethod()
     extractors['sentencerank+sw'] = sentencerank_method.SentenceRankMethod(stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, stopWordsData = _stopWordsData)
+    extractors['sentencerank+morfo:noun+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, stopWordsData = _stopWordsData, pos = _pos)
     extractors['sentencerank+morfo+thes+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, thesData = _thesData, stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, relData = _relData, stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+thes+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = True, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
@@ -76,6 +79,13 @@ def count_ranking_for_text(text_id):
         if tid == text_id:
             rank[s] = importance[(tid, s)]*1./denominators[tid]
     return rank
+
+def compareExtracts(xt_method, tid):
+    r = rankings[(tid, xt_method)]
+    ref = rankings[(tid, 'x-tractor')]
+    r_ext = map(lambda (x,y):x, sorted(r.items(), key = lambda (x, y): -y)[:int(math.ceil(len(r)/3))])
+    ref_ext = map(lambda (x,y):x, sorted(ref.items(), key = lambda (x, y): -y)[:int(math.ceil(len(r)/3))])
+    return set(r_ext).intersection(set(ref_ext)) *1./len(ref_ext)
 
 if __name__ == '__main__':
     count_importances('http://localhost:9999/main/')
