@@ -73,27 +73,25 @@ def load_texts(url):
         texts[int(tid)] = source_document.DocumentObject(sources[tid])
     
 
-def count_ranking_for_text(text_id):
+def count_ref_ranking_for_text(text_id):
     rank = {}
     for (tid, s) in importance:
         if tid == text_id:
             rank[s] = importance[(tid, s)]*1./denominators[tid]
     return rank
 
+
 def compareExtracts(xt_method, tid):
     r = rankings[(tid, xt_method)]
     ref = rankings[(tid, 'x-tractor')]
     r_ext = map(lambda (x,y):x, sorted(r.items(), key = lambda (x, y): -y)[:int(math.ceil(len(r)/3))])
     ref_ext = map(lambda (x,y):x, sorted(ref.items(), key = lambda (x, y): -y)[:int(math.ceil(len(r)/3))])
-    return set(r_ext).intersection(set(ref_ext)) *1./len(ref_ext)
+    return len(set(r_ext).intersection(set(ref_ext))) *1./len(ref_ext)
 
-if __name__ == '__main__':
-    count_importances('http://localhost:9999/main/')
-    load_texts('http://localhost:9999/main/')
-    create_extractors('/home/aglazek/private/praca/lang_data/thesaurus-utf8.txt', '/home/aglazek/private/praca/lang_data/related_words.txt', '/home/aglazek/private/praca/lang_data/combined_stopwords.txt', ['noun'])
+def prepareStatistics():
     for tid in texts:
         ln = len(texts[tid].getSentences())
-        rankings[(tid, 'x-tractor')] = count_ranking_for_text(tid)
+        rankings[(tid, 'x-tractor')] = count_ref_ranking_for_text(tid)
         for xt in extractors:
             print tid, xt
             dist = 0
@@ -108,6 +106,12 @@ if __name__ == '__main__':
     for xt in extractors:
         d = [distances[(tid, xt)] for tid in texts]
         avg_dists[xt] = sum(d)/len(d)
+
+if __name__ == '__main__':
+    count_importances('http://localhost:9999/main/')
+    load_texts('http://localhost:9999/main/')
+    create_extractors('/home/aglazek/private/praca/lang_data/thesaurus-utf8.txt', '/home/aglazek/private/praca/lang_data/related_words.txt', '/home/aglazek/private/praca/lang_data/combined_stopwords.txt', ['noun'])
+    prepareStatistics()
     print rankings
     print distances
     print avg_dists
