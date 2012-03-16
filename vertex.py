@@ -65,7 +65,10 @@ class SentenceVertex(Vertex):
         return self._sentence
         
     def similarity(self, s):
-        return len([w for w in self.getAllWords() if w in s.getAllWords()]) * 1. / (math.log(len(self.getAllWords())) + math.log(len(s.getAllWords())))
+        try:
+            return len([w for w in self.getAllWords() if w in s.getAllWords()]) * 1. / (math.log(len(self.getAllWords())) + math.log(len(s.getAllWords())))
+        except ValueError:
+            return 0
         
     def getAllWords(self):
         return self._bow

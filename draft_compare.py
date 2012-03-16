@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import json
+import sys
 import urllib
 import math
 import source_document
@@ -88,21 +89,25 @@ def compareExtracts(xt_method, tid):
     ref_ext = map(lambda (x,y):x, sorted(ref.items(), key = lambda (x, y): -y)[:int(math.ceil(len(r)/3))])
     return len(set(r_ext).intersection(set(ref_ext))) *1./len(ref_ext)
 
+def textXtStats(tid, xt):
+    print tid, xt
+    ln = len(texts[tid].getSentences())
+    sys.stdout.flush()
+    dist = 0
+    rankings[(tid, xt)] = extractors[xt].rankSentences(texts[tid])
+    for i in range(ln):
+        if i not in rankings[(tid, xt)]: a = 0
+        else: a = rankings[(tid, xt)][i]
+        if i not in rankings[(tid, 'x-tractor')]: b = 0
+        else: b = rankings[(tid, 'x-tractor')][i]
+        dist += pow((a-b), 2)
+    distances[(tid, xt)]= math.sqrt(dist)
+
 def prepareStatistics():
     for tid in texts:
-        ln = len(texts[tid].getSentences())
         rankings[(tid, 'x-tractor')] = count_ref_ranking_for_text(tid)
         for xt in extractors:
-            print tid, xt
-            dist = 0
-            rankings[(tid, xt)] = extractors[xt].rankSentences(texts[tid])
-            for i in range(ln):
-                if i not in rankings[(tid, xt)]: a = 0
-                else: a = rankings[(tid, xt)][i]
-                if i not in rankings[(tid, 'x-tractor')]: b = 0
-                else: b = rankings[(tid, 'x-tractor')][i]
-                dist += pow((a-b), 2)
-            distances[(tid, xt)]= math.sqrt(dist)
+            textXtStats(tid, xt)
     for xt in extractors:
         d = [distances[(tid, xt)] for tid in texts]
         avg_dists[xt] = sum(d)/len(d)
