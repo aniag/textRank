@@ -25,5 +25,6 @@ class SentenceRankMethod(rank_method.RankMethod):
         denom = 0
         for v in self._graph.getVertices():
             rank[v.getOrdinalNumber()] = v.getScore()
-        for i in rank: rank[i] /= sum(rank.values())
+            denom += v.getScore()
+        for i in rank: rank[i] /= denom
         return rank

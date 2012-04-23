@@ -9,8 +9,11 @@ class PageRank(object):
         self._vertices = vertices
         self._edges = edges
         self._d = d
-        self._vertices[0].setOldScore(1)
-        self._vertices[0].setScore(1)
+        if len(vertices) > 1:
+            self._vertices[0].setOldScore(1)
+            self._vertices[0].setScore(1)
+        else:
+            print 'Empty graph!'
 
     def pageRankIteration(self):
         for vrtx in self._vertices:

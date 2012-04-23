@@ -1,15 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import agl_morfeusz
 import stopwords
 import related_words
 import thesaurus
 
 class RankMethod(object):
 
-    def __init__(self, morfo = False, stopWordsData = None, thesData = None, relData = None, pos = None):
-        self._use_morfo = morfo
+    def __init__(self, morfo = None, stopWordsData = None, thesData = None, relData = None, pos = None):
+        self._use_morfo = False
         self._use_stopwords = False
         self._use_thes = False
         self._use_rel = False
@@ -18,7 +17,8 @@ class RankMethod(object):
         self._thes = None
         self._rel = None
         if morfo:
-            self._morfo = agl_morfeusz
+            self._morfo = morfo
+            self._use_morfo = True
         if stopWordsData:
             self._stopwords = stopwords.StopWords(stopWordsData)
             self._use_stopwords = True
