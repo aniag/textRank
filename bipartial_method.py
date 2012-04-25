@@ -27,7 +27,7 @@ class BipartialMethod(rank_method.RankMethod):
         self._graph = graph.Graph()
         self._word2vert = {}
         self._prepareGraph(text)
-        pr = pageRank.PageRank(self._graph.getVertices(), self._graph.getEdges())
+        pr = pageRank.PageRank(self._graph.getVertices(), self._graph.getEdges(), 0)
         while not pr.checkConvergence(threshold): pr.pageRankIteration()
         rank = {}
         denom = 0
