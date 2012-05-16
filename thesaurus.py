@@ -9,6 +9,7 @@ class Thesaurus(object):
     def __init__(self, thesFile):
         self._thesFile = thesFile
         self._thes = {}
+        self._inverted = {}
 
     def prepare_representation(self):
         '''
@@ -19,11 +20,14 @@ class Thesaurus(object):
         i = 0
         source = codecs.open(self._thesFile, mode='r', encoding='utf8')
         for line in source:
+            self._inverted[i] = []
             entries = line.strip().split(';')
             for entry in entries:
+                self._inverted[i].append(entry)
                 if entry not in self._thes:
                     self._thes[entry] = []
                 self._thes[entry].append(i)
+                
             i += 1
         source.close()
         print '[INFO] preprocessing finnished'
@@ -40,9 +44,14 @@ class Thesaurus(object):
             idxs = self._thes[word]
         except KeyError:
             return [word]
+        '''
         for t in self._thes:
             if self._thes[t][0] > max(idxs): continue
             if self._thes[t][-1] < min(idxs): continue
             if len(set(self._thes[t]).intersection(set(idxs))) > 0:
                 res.append(t)
+        '''
+        for i in idxs:
+            res += self._inverted[i]
         return res
+        
