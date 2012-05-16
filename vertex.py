@@ -7,7 +7,7 @@ class Vertex(object):
     def __init__(self):
         self._score = None
         self._oldScore = 0
-        self._neighbours = []
+        self._neighbours = set()
         self._outSum = 0
     
     def getScore(self):
@@ -31,14 +31,13 @@ class Vertex(object):
     
     def getOutSum(self):
         return self._outSum
-        # return len(self._neighbours)
     
     def getNeighbours(self):
         return self._neighbours
     
     def addNeighbour(self, v):
         if v not in self._neighbours:
-            self._neighbours.append(v)
+            self._neighbours.add(v)
         
     def incOutSum(self, val):
         self._outSum += val

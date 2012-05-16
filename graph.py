@@ -4,17 +4,17 @@
 
 class Graph(object):
     def __init__(self):
-        self._vertices = []
+        self._vertices = set()
         self._edges = {}
         
     def addVertex(self, v):
-        self._vertices.append(v)
+        self._vertices.add(v)
         
     def getVertices(self):
         return self._vertices
         
     def addEdge(self, v1, v2, weight):
-        if (v1, v2) in self._edges: weight += self._edges[(v1, v2)]
+        weight += self._edges.get((v1, v2), 0)
         self._edges[(v1,v2)] = weight
         self._edges[(v2,v1)] = weight
     
@@ -55,12 +55,20 @@ class GraphOfWords(Graph):
         for vrx in self._window[-1]:
             self.addVertex(vrx)
             for i in range(self._windowSize):
+                '''
+                if len(self._window[i]) > 240:
+                    for v in self._window[i]:
+                        print v._baseWord
+                    raise Exception()
+                '''
                 for pred in self._window[i]:
                     w = (i+1)*1.0/self._windowSize
                     self.addEdge(vrx, pred, w)
                     vrx.addNeighbour(pred)
                     pred.addNeighbour(vrx)
-                    vrx.incOutSum(w)
-                    pred.incOutSum(w)
+                    # vrx.incOutSum(w)
+                    # pred.incOutSum(w)
+                    vrx._outSum += w
+                    pred._outSum += w
                 #TODO: sprawdzić czy to zostało zrobione: dodać krawędzie i sąsiadów
 
