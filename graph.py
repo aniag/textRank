@@ -28,12 +28,13 @@ class GraphOfSentences(Graph):
              
     def update(self, v):
         for u in self._vertices:
-            v.addNeighbour(u)
-            u.addNeighbour(v)
             w = u.similarity(v)
-            self.addEdge(u, v, w)
-            v.incOutSum(w)
-            u.incOutSum(w)
+            if w > 0:
+                v.addNeighbour(u)
+                u.addNeighbour(v)
+                self.addEdge(u, v, w)
+                v.incOutSum(w)
+                u.incOutSum(w)
         self.addVertex(v)
         
 class GraphOfWords(Graph):
