@@ -5,7 +5,7 @@
 
 class PageRank(object):
 
-    def __init__(self, vertices = [], edges = {}, d = 0.05):
+    def __init__(self, vertices, edges = {}, d = 0.05):
         self._vertices = vertices
         self._edges = edges
         self._d = d

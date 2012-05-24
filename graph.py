@@ -56,20 +56,28 @@ class GraphOfWords(Graph):
         for vrx in self._window[-1]:
             self.addVertex(vrx)
             for i in range(self._windowSize):
-                '''
-                if len(self._window[i]) > 240:
-                    for v in self._window[i]:
-                        print v._baseWord
-                    raise Exception()
-                '''
                 for pred in self._window[i]:
                     w = (i+1)*1.0/self._windowSize
                     self.addEdge(vrx, pred, w)
                     vrx.addNeighbour(pred)
                     pred.addNeighbour(vrx)
-                    # vrx.incOutSum(w)
-                    # pred.incOutSum(w)
                     vrx._outSum += w
                     pred._outSum += w
-                #TODO: sprawdzić czy to zostało zrobione: dodać krawędzie i sąsiadów
 
+class BipartialMixedGraph(Graph):
+    def __init__(self):
+        self._SentenceVertices = set()
+        self._WordVertices = set()
+        self._edges = {}
+        
+    def addSentenceVertex(self, v):
+        self._SentenceVertices.add(v)
+        
+    def addWordVertex(self, v):
+        self._WordVertices.add(v)
+        
+    def getSentenceVertices(self):
+        return self._SentenceVertices
+        
+    def getWordVertices(self):
+        return self._WordVertices
