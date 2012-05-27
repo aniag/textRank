@@ -44,7 +44,6 @@ class RankMethod(object):
                     if pos in self._pos: bases.append(base)
             else:
                 bases = self._morfo.getBasesLists(word)[0]
-            considered.update(set(bases))
         if self._use_thes:
             if self._use_morfo: 
                 for b in bases:
@@ -56,4 +55,4 @@ class RankMethod(object):
                     considered.update(set(self._rel.lookUpWord(b)))
             else: considered.update(set(self._rel.lookUpWord(word)))
         if len(considered) == 0 and not self._selected_poses: considered = set([word])
-        return considered
+        return (bases, considered)

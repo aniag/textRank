@@ -38,6 +38,9 @@ class Vertex(object):
     def addNeighbour(self, v):
         if v not in self._neighbours:
             self._neighbours.add(v)
+            
+    def unionNeighbours(self, s):
+        self._neighbours.union(s)
         
     def incOutSum(self, val):
         self._outSum += val

@@ -7,7 +7,8 @@ class StatisticMethod(rank_method.RankMethod):
         for sent in text.getSentences():
             for word in sent.getTokens():
                 if self._use_stopwords and self._stopwords.isStopWord(word.encode('utf8')): continue
-                related = self.relatedWords(word)
+                (a, b) = self.relatedWords(word)
+                related = a+b
                 for form in related:
                     if form not in self.words: self.words[form] = 0
                     self.words[form] += 1
