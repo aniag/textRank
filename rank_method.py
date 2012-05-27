@@ -4,6 +4,7 @@
 import stopwords
 import related_words
 import thesaurus
+import math
 
 class RankMethod(object):
 
@@ -33,7 +34,17 @@ class RankMethod(object):
             assert self._use_morfo, 'to use POS list, morfo must be enabled'
             self._pos = pos
             self._selected_poses = True
-        
+    
+    def getBases(self, word):
+        bases = []
+        if self._use_morfo:
+            if self._selected_poses:
+                for (base, pos) in self._morfo.getBaseWithPOS(word):
+                    if pos in self._pos: bases.append(base)
+            else:
+                bases = self._morfo.getBasesLists(word)[0]
+        if len(bases) == 0 and not self._selected_poses: bases = [word]
+        return bases
         
     def relatedWords(self, word):
         considered = set([])
@@ -57,3 +68,12 @@ class RankMethod(object):
             else: considered.update(set(self._rel.lookUpWord(word)))
         if len(considered) == 0 and not self._selected_poses: considered = set([word])
         return considered
+        
+    def printExtract(self, text):
+        k = int(math.ceil(len(text.getSentences()) * 1./3))
+        ranking = self.rankSentences(text)
+        pairs = ranking.items()
+        pairs.sort(key=lambda v: v[1], reverse=True)
+        ranking = dict(pairs[:k])
+        for i in ranking:
+            print text.getSentence(i).getOriginalSentence()
