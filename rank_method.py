@@ -62,6 +62,7 @@ class RankMethod(object):
     def printExtract(self, text):
         k = int(math.ceil(len(text.getSentences()) * 1./3))
         ranking = self.rankSentences(text)
+        print ranking
         pairs = ranking.items()
         pairs.sort(key=lambda v: v[1], reverse=True)
         ranking = dict(pairs[:k])

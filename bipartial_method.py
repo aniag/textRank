@@ -22,7 +22,7 @@ class BipartialMethod(rank_method.RankMethod):
                     
                     
 
-    def rankSentences(self, text, threshold=0.01):
+    def rankSentences(self, text, threshold=0.0001):
         self._graph = graph.BipartialMixedGraph()
         self._word2vert = {}
         self._prepareGraph(text)
