@@ -26,7 +26,7 @@ class WordRankMethod(rank_method.RankMethod):
                 self._graph.addToWindow(vBucket)
                 self._graph.update()
 
-    def rankSentences(self, text, wsize = 3, threshold=0.01):
+    def rankSentences(self, text, wsize = 3, threshold=0.0001):
         self._graph = graph.GraphOfWords(wsize)
         self._word2vert = {}
         self._prepareGraph(text)
