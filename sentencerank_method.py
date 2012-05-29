@@ -18,7 +18,7 @@ class SentenceRankMethod(rank_method.RankMethod):
             if v.getAllWords > 1:
                 self._graph.update(v)
 
-    def rankSentences(self, text, threshold=0.01):
+    def rankSentences(self, text, threshold=0.0001):
         self._graph = graph.GraphOfSentences()
         self._prepareGraph(text)
         pr = pageRank.PageRank(self._graph.getVertices(), self._graph.getEdges())
