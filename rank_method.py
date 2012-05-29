@@ -4,6 +4,7 @@
 import stopwords
 import related_words
 import thesaurus
+import math
 
 class RankMethod(object):
 
@@ -57,3 +58,12 @@ class RankMethod(object):
             else: considered.update(set(self._rel.lookUpWord(word)))
         if len(considered) == 0 and not self._selected_poses: considered = set([word])
         return considered
+        
+    def printExtract(self, text):
+        k = int(math.ceil(len(text.getSentences()) * 1./3))
+        ranking = self.rankSentences(text)
+        pairs = ranking.items()
+        pairs.sort(key=lambda v: v[1], reverse=True)
+        ranking = dict(pairs[:k])
+        for i in ranking:
+            print text.getSentence(i).getOriginalSentence()
