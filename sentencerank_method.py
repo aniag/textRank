@@ -8,16 +8,27 @@ import pageRank
 
 class SentenceRankMethod(rank_method.RankMethod):
 
+    def _firstPass(self, text):
+        for sent in text.getSentences():
+            for word in sent.getTokens():
+                for base in self.getBases(word):
+                    self._bases.add(base)
+                        
+    def _getConsidered(self, word):
+        return set(self.relatedWords(word)).intersection(self._bases)
+    
     def _prepareGraph(self, text):
+        self._firstPass(text)
         for sent in text.getSentences():
             v = vertex.SentenceVertex(sent)
             for word in sent.getTokens():
-                v.addWords(self.relatedWords(word))
+                v.addWords(self._getConsidered(word))
             if v.getAllWords > 1:
                 self._graph.update(v)
 
     def rankSentences(self, text, threshold=0.0001):
         self._graph = graph.GraphOfSentences()
+        self._bases = set()
         self._prepareGraph(text)
         pr = pageRank.PageRank(self._graph.getVertices(), self._graph.getEdges())
         while not pr.checkConvergence(threshold): pr.pageRankIteration()

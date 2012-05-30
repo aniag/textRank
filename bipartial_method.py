@@ -5,17 +5,27 @@ import bipartialHITS
 
 class BipartialMethod(rank_method.RankMethod):
 
+    def _firstPass(self, text):
+        for sent in text.getSentences():
+            for word in sent.getTokens():
+                for base in self.getBases(word):
+                    if base not in self._word2vert:
+                        w = vertex.WordVertex(base)
+                        self._word2vert[base] = w
+                        self._graph.addWordVertex(w)
+                        
+    def _getConsidered(self, word):
+        return set(self.relatedWords(word)).intersection(set(self._word2vert.keys()))
+
     def _prepareGraph(self, text):
+        self._firstPass(text)
         for sent in text.getSentences():
             v = vertex.SentenceVertex(sent)
             self._graph.addSentenceVertex(v)
             for word in sent.getTokens():
-                for form in self.relatedWords(word):
-                    if form not in self._word2vert: 
-                        w = vertex.WordVertex(form)
-                        self._word2vert[form] = w
-                        self._graph.addWordVertex(w)
+                for form in self._getConsidered(word):
                     w = self._word2vert[form]
+                    
                     self._graph.addEdge(v, w, 1)
                     v.addNeighbour(w)
                     w.addNeighbour(v)
@@ -27,6 +37,7 @@ class BipartialMethod(rank_method.RankMethod):
         self._word2vert = {}
         self._prepareGraph(text)
         hits = bipartialHITS.BipartialHITS(self._graph._WordVertices, self._graph._SentenceVertices, self._graph.getEdges())
+        hits.HITSiteration()
         while not hits.checkConvergence(threshold): hits.HITSiteration()
         rank = {}
         denom = 0
