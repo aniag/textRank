@@ -35,6 +35,25 @@ class RankMethod(object):
             self._pos = pos
             self._selected_poses = True
         
+    def getBases(self, word):
+        bases = []
+        if self._use_morfo:
+            if self._selected_poses:
+                for (base, pos) in self._morfo.getBaseWithPOS(word):
+                    if pos in self._pos: bases.append(base)
+            else:
+                bases = self._morfo.getBasesLists(word)[0]
+        return bases
+        
+    def getRelated(self, word):
+        considered = set()
+        if self._use_thes:
+            considered.update(set(self._thes.lookUpWord(word)))
+        if self._use_rel:
+            considered.update(set(self._rel.lookUpWord(word)))
+        if len(considered) == 0 and not self._selected_poses: considered = set([word])
+        return considered
+    
         
     def relatedWords(self, word):
         considered = set([])
@@ -45,6 +64,7 @@ class RankMethod(object):
                     if pos in self._pos: bases.append(base)
             else:
                 bases = self._morfo.getBasesLists(word)[0]
+            considered.update(set(bases))
         if self._use_thes:
             if self._use_morfo: 
                 for b in bases:
@@ -56,7 +76,7 @@ class RankMethod(object):
                     considered.update(set(self._rel.lookUpWord(b)))
             else: considered.update(set(self._rel.lookUpWord(word)))
         if len(considered) == 0 and not self._selected_poses: considered = set([word])
-        return (bases, considered)
+        return considered
         
     def printExtract(self, text):
         k = int(math.ceil(len(text.getSentences()) * 1./3))

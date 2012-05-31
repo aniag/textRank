@@ -12,9 +12,7 @@ class SentenceRankMethod(rank_method.RankMethod):
         for sent in text.getSentences():
             v = vertex.SentenceVertex(sent)
             for word in sent.getTokens():
-                (a, b) = self.relatedWords(word)
-                related = a+b
-                v.addWords(related)
+                v.addWords(self.relatedWords(word))
             if v.getAllWords > 1:
                 self._graph.update(v)
 
