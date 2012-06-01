@@ -14,9 +14,14 @@ class Graph(object):
         return self._vertices
         
     def addEdge(self, v1, v2, weight):
+        v1.incOutSum(weight)
+        v2.incOutSum(weight)
         weight += self._edges.get((v1, v2), 0)
         self._edges[(v1,v2)] = weight
         self._edges[(v2,v1)] = weight
+        v1.addNeighbour(v2)
+        v2.addNeighbour(v1)
+
     
     def getEdges(self):
         return self._edges
@@ -30,11 +35,7 @@ class GraphOfSentences(Graph):
         for u in self._vertices:
             w = u.similarity(v)
             if w > 0:
-                v.addNeighbour(u)
-                u.addNeighbour(v)
                 self.addEdge(u, v, w)
-                v.incOutSum(w)
-                u.incOutSum(w)
         self.addVertex(v)
         
 class GraphOfWords(Graph):
@@ -59,10 +60,6 @@ class GraphOfWords(Graph):
                 for pred in self._window[i]:
                     w = (i+1)*1.0/self._windowSize
                     self.addEdge(vrx, pred, w)
-                    vrx.addNeighbour(pred)
-                    pred.addNeighbour(vrx)
-                    vrx._outSum += w
-                    pred._outSum += w
 
 class BipartialMixedGraph(Graph):
     def __init__(self):

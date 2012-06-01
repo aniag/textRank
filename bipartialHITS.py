@@ -6,10 +6,9 @@ import math
 
 class BipartialHITS(object):
 
-    def __init__(self, authVertices, hubVertices, edges = {}):
+    def __init__(self, authVertices, hubVertices):
         self._AuthVertices = authVertices
         self._HubVertices = hubVertices
-        self._edges = edges
         if len(self._HubVertices) > 1:
             for v in self._HubVertices:
                 v.setScore(1)

@@ -27,12 +27,6 @@ class PageRank(object):
                 score += neighbour._oldScore * self._edges[(vrtx, neighbour)] * 1./neighbour._outSum
             vrtx.setScore(self._d*1./len(self._vertices) + (1-self._d)*score)
             
-    def addEdge(self, v, w, weight):
-        if (v, w) not in self._edges:
-            self._edges[(v, w)] = weight
-            self._edges[(w, v)] = weight
-        else: assert(self._edges[(v, w)] == weight)
-        
     def checkConvergence(self, threshold):
         for vertex in self._vertices:
             if vertex.getDiff() > threshold:

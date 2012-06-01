@@ -25,8 +25,6 @@ class BipartialMethod(rank_method.RankMethod):
             for word in sent.getTokens():
                 for form in self._getConsidered(word):
                     w = self._word2vert[form]
-                    
-                    self._graph.addEdge(v, w, 1)
                     v.addNeighbour(w)
                     w.addNeighbour(v)
                     
@@ -36,7 +34,7 @@ class BipartialMethod(rank_method.RankMethod):
         self._graph = graph.BipartialMixedGraph()
         self._word2vert = {}
         self._prepareGraph(text)
-        hits = bipartialHITS.BipartialHITS(self._graph._WordVertices, self._graph._SentenceVertices, self._graph.getEdges())
+        hits = bipartialHITS.BipartialHITS(self._graph._WordVertices, self._graph._SentenceVertices)
         hits.HITSiteration()
         while not hits.checkConvergence(threshold): hits.HITSiteration()
         rank = {}
