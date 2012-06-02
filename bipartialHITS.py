@@ -6,9 +6,10 @@ import math
 
 class BipartialHITS(object):
 
-    def __init__(self, authVertices, hubVertices):
+    def __init__(self, authVertices, hubVertices, edges):
         self._AuthVertices = authVertices
         self._HubVertices = hubVertices
+        self._edges = edges
         if len(self._HubVertices) > 1:
             for v in self._HubVertices:
                 v.setScore(1)
@@ -24,7 +25,7 @@ class BipartialHITS(object):
         for vrtx in self._AuthVertices:
             score = 0
             for neighbour in vrtx.getNeighbours():
-                score += neighbour._score
+                score += neighbour._score * self._edges[(vrtx, neighbour)]
             vrtx._score = score
             norm += pow(score, 2)
         norm = math.sqrt(norm)
@@ -34,7 +35,7 @@ class BipartialHITS(object):
         for vrtx in self._HubVertices:
             score = 0
             for neighbour in vrtx.getNeighbours():
-                score += neighbour._score
+                score += neighbour._score * self._edges[(vrtx, neighbour)]
             vrtx._score = score
             norm += pow(score, 2)
         norm = math.sqrt(norm)
@@ -42,8 +43,6 @@ class BipartialHITS(object):
             score = vrtx._score * 1. / norm
             vrtx._score = score
         
-            
-                    
     def checkConvergence(self, threshold):
         for vertex in self._HubVertices:
             if vertex.getDiff() > threshold:
