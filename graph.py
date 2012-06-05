@@ -54,11 +54,11 @@ class GraphOfWords(Graph):
         self._window[-1] = vSet
     
     def update(self):
-        for vrx in self._window[-1]:
+        for vrx, wv in self._window[-1]:
             self.addVertex(vrx)
             for i in range(self._windowSize):
-                for pred in self._window[i]:
-                    w = (i+1)*1.0/self._windowSize
+                for pred, wp in self._window[i]:
+                    w = wp * wv * (i+1)*1.0/self._windowSize
                     self.addEdge(vrx, pred, w)
 
 class BipartialMixedGraph(Graph):

@@ -54,6 +54,24 @@ class RankMethod(object):
             considered.update(set(self._rel.lookUpWord(base)))
         return considered
 
+    def getWeightedForms(self, word):
+        results = set()
+        bases = self.getBases(word)
+        base_weight = 1.
+        if len(bases) > 0:
+            base_weight = 1. / len(bases)
+        for base in bases:
+            rForms = self.getConsidered(base)
+            rForms.discard(base)
+            rForm_weight = 0
+            if len(rForms) > 0:
+                rForm_weight = base_weight / (2*len(rForms))
+                base_weight /= 2
+            results.add((base, base_weight))
+            for rForm in rForms:
+                results.add((rForm, rForm_weight))
+        return results
+
     def relatedWords(self, word):
         considered = set([])
         bases = []

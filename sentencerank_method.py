@@ -14,8 +14,8 @@ class SentenceRankMethod(rank_method.RankMethod):
                 for base in self.getBases(word):
                     self._bases.add(base)
                         
-    def _getConsidered(self, word):
-        return set(self.relatedWords(word)).intersection(self._bases)
+    def getConsidered(self, word):
+        return set(self.getRelatedForms(word)).intersection(self._bases)
     
     def _prepareGraph(self, text):
         self._firstPass(text)
