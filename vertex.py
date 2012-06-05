@@ -65,15 +65,22 @@ class SentenceVertex(Vertex):
         
     def similarity(self, s):
         try:
-            return len([w for w in self.getAllWords() if w in s.getAllWords()]) * 1. / (math.log(len(self.getAllWords())) + math.log(len(s.getAllWords())))
+            similarity_score = 0
+            d1 = dict(self.getAllWords())
+            d2 = dict(s.getAllWords())
+            for w in d1:
+                if w in d2:
+                    similarity_score += d1[w] * d2[w]
+            similarity_score /= 1. * (math.log(len(self.getAllWords())) + math.log(len(s.getAllWords())))
+            return similarity_score
         except (ValueError, ZeroDivisionError):
             return 0
         
     def getAllWords(self):
         return self._bow
             
-    def addWords(self, wordList):
-        self._bow.update(set(wordList))
+    def addWords(self, formSet):
+        self._bow.update(formSet)
             
     def getOrdinalNumber(self):
         return self._sentence.getOrdinalNumber()

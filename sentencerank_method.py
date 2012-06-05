@@ -22,8 +22,8 @@ class SentenceRankMethod(rank_method.RankMethod):
         for sent in text.getSentences():
             v = vertex.SentenceVertex(sent)
             for word in sent.getTokens():
-                v.addWords(self._getConsidered(word))
-            if v.getAllWords > 1:
+                v.addWords(self.getWeightedForms(word))
+            if len(v.getAllWords()) > 1:
                 self._graph.update(v)
 
     def rankSentences(self, text, threshold=0.0001):
