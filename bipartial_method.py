@@ -15,7 +15,8 @@ class BipartialMethod(rank_method.RankMethod):
                         self._graph.addWordVertex(w)
                         
     def _getConsidered(self, word):
-        return set(self.relatedWords(word)).intersection(set(self._word2vert.keys()))
+        return set(self.getRelatedForms(word)).intersection(set(self._word2vert.keys()))
+
 
     def _prepareGraph(self, text):
         self._firstPass(text)
@@ -23,9 +24,19 @@ class BipartialMethod(rank_method.RankMethod):
             v = vertex.SentenceVertex(sent)
             self._graph.addSentenceVertex(v)
             for word in sent.getTokens():
-                for form in self._getConsidered(word):
-                    w = self._word2vert[form]
-                    self._graph.addEdge(v, w, 1)
+                bases = self.getBases(word)
+                base_weight = 1.
+                if len(bases) > 0:
+                    base_weight = 1. / len(bases)
+                for base in bases:
+                    rForms = self._getConsidered(base)
+                    rForm_weight = 0
+                    if len(rForms) > 0:
+                        rForm_weight = base_weight / (2*len(rForms))
+                        base_weight /= 2
+                    self._graph.addEdge(v, self._word2vert[base], base_weight)
+                    for rForm in rForms:
+                        self._graph.addEdge(v, self._word2vert[rForm], rForm_weight)
                     
                     
 

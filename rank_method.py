@@ -46,6 +46,14 @@ class RankMethod(object):
         if len(bases) == 0 and not self._selected_poses: bases = [word]
         return bases
         
+    def getRelatedForms(self, base):
+        considered = set()
+        if self._use_thes:
+            considered.update(set(self._thes.lookUpWord(base)))
+        if self._use_rel:
+            considered.update(set(self._rel.lookUpWord(base)))
+        return considered
+
     def relatedWords(self, word):
         considered = set([])
         bases = []
