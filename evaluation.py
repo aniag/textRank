@@ -5,7 +5,7 @@ import json
 import sys, urllib, math
 import source_document
 import rank_method
-import random_method, ordinal_method, statistic_method, sentencerank_method, wordrank_method
+import random_method, ordinal_method, statistic_method, sentencerank_method, wordrank_method, bipartial_method
 import agl_morfeusz as morfeusz
 
 xtracts = []
@@ -19,7 +19,8 @@ authors = {}
 grades = {}
 automatic_ranking = {}
 
-
+rms_error = {}
+method_cumulated_error = {}
 
 
 def load_texts(filename):
@@ -89,7 +90,7 @@ def prepare_grades():
 def create_extractors(_thesData, _relData, _stopWordsData, _pos):
     extractors['random'] = random_method.RandomMethod()
     extractors['ordinal'] = ordinal_method.OrdinalMethod()
-    extractors['statistic'] = statistic_method.StatisticMethod()
+    '''extractors['statistic'] = statistic_method.StatisticMethod()
     extractors['statistic+sw'] = statistic_method.StatisticMethod(stopWordsData = _stopWordsData)
     extractors['statistic+morfo+sw'] = statistic_method.StatisticMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
     extractors['statistic+morfo:noun+sw'] = statistic_method.StatisticMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
@@ -112,13 +113,21 @@ def create_extractors(_thesData, _relData, _stopWordsData, _pos):
     extractors['sentencerank+morfo+thes+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
     extractors['sentencerank+morfo+thes+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['sentencerank+morfo:nouns+thes+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
+    extractors['sentencerank+morfo:nouns+thes+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)'''
+    extractors['bipartial'] = bipartial_method.BipartialMethod()
+    extractors['bipartial+sw'] = bipartial_method.BipartialMethod(stopWordsData = _stopWordsData)
+    extractors['bipartial+morfo+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
+    extractors['bipartial+morfo:noun+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
+    extractors['bipartial+morfo+thes+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
+    extractors['bipartial+morfo+rel+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['bipartial+morfo+thes+rel+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['bipartial+morfo:nouns+thes+rel+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
     
 def prepare_automatic_rankings():
     for xt in extractors:
-        print '############', xt, '############'
+        # print '############', xt, '############'
         for tid in texts:
-            print texts[tid].getTitle()
+            # print texts[tid].getTitle()
             automatic_ranking[(tid, xt)] = extractors[xt].rankSentences(texts[tid])
 
 def title(tid):
@@ -139,3 +148,24 @@ def compare_xtract_method(method, tid, xtract):
     k = len(xtract)
     mres = getTopK(automatic_ranking[(tid, method)], k).keys()
     return len(set(xtract).intersection(set(mres)))*1./k
+    
+def RootMeanSquare(rank1, rank2):
+    rms = 0
+    sids = set(rank1).union(set(rank2))
+    for sid in sids:
+        rms += (rank1.get(sid, 0) - rank2.get(sid, 0)) ** 2
+    return rms ** 0.5
+
+def familiada(ranking, sent_list):
+    res = 0
+    for sid in sent_list:
+       res += ranking.get(sid, 0)
+    return res
+
+def prepare_rms_errors():
+    for ar in automatic_ranking:
+       tid, method = ar
+       rms = RootMeanSquare(automatic_ranking[ar], average_ranking[tid])
+       rms_error[ar] = rms
+       method_cumulated_error[method] = method_cumulated_error.get(method, 0) + rms
+

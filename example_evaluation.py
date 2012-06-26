@@ -7,4 +7,9 @@ e.prepare_avg_rankings()
 e.create_extractors('/home/aglazek/private/praca/lang_data/synonimy-slowosiec.txt', '/home/aglazek/private/praca/lang_data/related_words.txt', '/home/aglazek/private/praca/lang_data/combined_stopwords.txt', ['noun'])
 e.prepare_grades()
 e.prepare_automatic_rankings()
+e.prepare_rms_errors()
+p = e.method_cumulated_error.items()
+p.sort(key=lambda v : v[1])
+p
+
 
