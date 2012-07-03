@@ -38,6 +38,8 @@ class BipartialMethod(rank_method.RankMethod):
         rank = {}
         denom = 0
         for v in self._graph.getSentenceVertices():
+            # rank[v.getOrdinalNumber()] = 1 - v.getScore()
+            # denom += 1 - v.getScore()
             rank[v.getOrdinalNumber()] = v.getScore()
             denom += v.getScore()
         for i in rank: rank[i] /= denom
