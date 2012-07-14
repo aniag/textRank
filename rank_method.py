@@ -55,7 +55,8 @@ class RankMethod(object):
         return considered
 
     def getWeightedForms(self, word):
-        results = set()
+        # results = set()
+        results = {}
         bases = self.getBases(word)
         base_weight = 1.
         if len(bases) > 0:
@@ -67,10 +68,12 @@ class RankMethod(object):
             if len(rForms) > 0:
                 rForm_weight = base_weight / (2*len(rForms))
                 base_weight /= 2
-            results.add((base, base_weight))
+            #results.add((base, base_weight))
+            results[base] = results.get(base, 0) + base_weight
             for rForm in rForms:
-                results.add((rForm, rForm_weight))
-        return results
+                #results.add((rForm, rForm_weight))
+                results[rForm] = results.get(rForm, 0) + rForm_weight
+        return set(results.items())
 
     def relatedWords(self, word):
         considered = set([])

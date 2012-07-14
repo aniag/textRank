@@ -56,7 +56,7 @@ class SentenceVertex(Vertex):
     def __init__(self, sent):
         Vertex.__init__(self)
         assert(isinstance(sent, source_document.Sentence))
-        self._bow = set([])
+        self._bow = {}
         self._sentence = sent
         self._outSum = 0
         
@@ -77,10 +77,11 @@ class SentenceVertex(Vertex):
             return 0
         
     def getAllWords(self):
-        return self._bow
+        return set(self._bow.items())
             
     def addWords(self, formSet):
-        self._bow.update(formSet)
+        for k, v in formSet:
+            self._bow[k] = self._bow.get(k, 0) + v
             
     def getOrdinalNumber(self):
         return self._sentence.getOrdinalNumber()
