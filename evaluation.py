@@ -5,7 +5,7 @@ import json
 import sys, urllib, math
 import source_document
 import rank_method
-import random_method, ordinal_method, statistic_method, sentencerank_method, wordrank_method, bipartial_method, even_method
+import random_method, ordinal_method, statistic_method, sentencerank_method, alt_sentencerank_method, wordrank_method, bipartial_method, even_method
 import agl_morfeusz as morfeusz
 
 wikipedia = [2, 3, 5, 7, 8, 9, 11, 13, 18, 20, 22, 24, 30, 31, 32, 33, 34, 35, 37, 39, 40]
@@ -16,7 +16,12 @@ single_xtract = {}
 complement_ranking = {}
 xtract_by_title = {}
 average_ranking = {}
+relevant_sids = {}
 texts = {}
+false_positives_ratio = {}
+true_positives_ratio = {}
+false_positives = {}
+true_positives = {}
 extractors = {}
 authors = {}
 grades = {}
@@ -75,18 +80,18 @@ def prepare_complement_rankings():
         complement_ranking[(ex['tid'], ex['author'])] = ranking
 
 def prepare_avg_rankings():
-    denominators = {}
-    for ex in xtracts:
-        tid = ex['tid']
-        ranking = average_ranking.get(tid, {})
-        for sid in ex['res']:
-            ranking[sid] = ranking.get(sid, 0) + 1.
-            denominators[tid] = denominators.get(tid, 0) + 1
-        average_ranking[tid] = ranking
-    for tid in average_ranking:
-        ranking = average_ranking[tid]
+    for tid in xtract_by_title:
+        ranking = {}
+        denominator = 0
+        for l in xtract_by_title[tid]:
+            for sid in l:
+                ranking[sid] = ranking.get(sid, 0) + 1.
+                denominator += 1
         for sid in ranking:
-            ranking[sid] /= denominators[tid]
+            ranking[sid] /= denominator
+        average_ranking[tid] = ranking
+        relevant_sids[tid] = ranking.keys()
+        
 
 def prepare_grades():
     for x in xtracts:
@@ -96,42 +101,102 @@ def prepare_grades():
             if tid not in grades: grades[tid] = []
             grades[tid].append(g)
 
+def create_extractors_ord_sent(_thesData, _relData, _stopWordsData, _pos):
+    extractors['Ord'] = ordinal_method.OrdinalMethod()
+    extractors['Sent'] = sentencerank_method.SentenceRankMethod()
+    extractors['SentSMTR'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['OrdSent3'] = alt_sentencerank_method.SentenceRankMethod(d=0.3)
+    extractors['OrdSentSMTR3'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, d=0.3)
+    extractors['OrdSentSM:nTR3'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos, d=0.3)
+    extractors['OrdSent5'] = alt_sentencerank_method.SentenceRankMethod(d=0.5)
+    extractors['OrdSentSMTR5'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, d=0.5)
+    extractors['OrdSentSM:nTR5'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos, d=0.5)
+    extractors['OrdSent7'] = alt_sentencerank_method.SentenceRankMethod(d=0.7)
+    extractors['OrdSentSMTR7'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, d=0.7)
+    extractors['OrdSentSM:nTR7'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos, d=0.7)
+    extractors['OrdSent9'] = alt_sentencerank_method.SentenceRankMethod(d=0.9)
+    extractors['OrdSentSMTR9'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, d=0.9)
+    extractors['OrdSentSM:nTR9'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos, d=0.9)
+
+def create_extractors_initial_set(_thesData, _relData, _stopWordsData, _pos):
+    extractors['Rand0'] = random_method.RandomMethod()
+    extractors['Rand1'] = random_method.RandomMethod()
+    extractors['Rand2'] = random_method.RandomMethod()
+    extractors['Rand3'] = random_method.RandomMethod()
+    extractors['Rand4'] = random_method.RandomMethod()
+    extractors['Rand5'] = random_method.RandomMethod()
+    extractors['Rand6'] = random_method.RandomMethod()
+    extractors['Rand7'] = random_method.RandomMethod()
+    extractors['Rand8'] = random_method.RandomMethod()
+    extractors['Rand9'] = random_method.RandomMethod()
+    extractors['Ord'] = ordinal_method.OrdinalMethod()
+    extractors['Stat'] = statistic_method.StatisticMethod()
+    extractors['StatS'] = statistic_method.StatisticMethod(stopWordsData = _stopWordsData)
+    extractors['StatSM'] = statistic_method.StatisticMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
+    extractors['StatSM:n'] = statistic_method.StatisticMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
+    extractors['StatSMT'] = statistic_method.StatisticMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
+    extractors['StatSMR'] = statistic_method.StatisticMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['StatSMRT'] = statistic_method.StatisticMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['StatSM:nTR'] = statistic_method.StatisticMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
+    extractors['Word'] = wordrank_method.WordRankMethod()
+    extractors['WordS'] = wordrank_method.WordRankMethod(stopWordsData = _stopWordsData)
+    extractors['WordSM'] = wordrank_method.WordRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
+    extractors['WordSM:n'] = wordrank_method.WordRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
+    extractors['WordSMT'] = wordrank_method.WordRankMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
+    extractors['WordSMR'] = wordrank_method.WordRankMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['WordSM+TR'] = wordrank_method.WordRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['WordSM:nTR'] = wordrank_method.WordRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
+    extractors['Sent'] = sentencerank_method.SentenceRankMethod()
+    extractors['SentS'] = sentencerank_method.SentenceRankMethod(stopWordsData = _stopWordsData)
+    extractors['SentSM'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
+    extractors['SentSM:n'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
+    extractors['SentSMT'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
+    extractors['SentSMR'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['SentSMTR'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['SentSM:nTR'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
+    extractors['Mut'] = bipartial_method.BipartialMethod()
+    extractors['MutS'] = bipartial_method.BipartialMethod(stopWordsData = _stopWordsData)
+    extractors['MutSM'] = bipartial_method.BipartialMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
+    extractors['MutSM:n'] = bipartial_method.BipartialMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
+    extractors['MutSMT'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
+    extractors['MutSMR'] = bipartial_method.BipartialMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['MutSMTR'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['MutSM:nTR'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
+    
 def create_extractors(_thesData, _relData, _stopWordsData, _pos):
-    # extractors['even'] = even_method.EvenMethod()
-    extractors['random'] = random_method.RandomMethod()
-    extractors['ordinal'] = ordinal_method.OrdinalMethod()
-    extractors['statistic'] = statistic_method.StatisticMethod()
-    extractors['statistic+sw'] = statistic_method.StatisticMethod(stopWordsData = _stopWordsData)
-    extractors['statistic+morfo+sw'] = statistic_method.StatisticMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
-    extractors['statistic+morfo:noun+sw'] = statistic_method.StatisticMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
-    extractors['statistic+morfo+thes+sw'] = statistic_method.StatisticMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
-    extractors['statistic+morfo+rel+sw'] = statistic_method.StatisticMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['statistic+morfo+thes+rel+sw'] = statistic_method.StatisticMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['statistic+morfo:nouns+thes+rel+sw'] = statistic_method.StatisticMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
-    extractors['wordrank'] = wordrank_method.WordRankMethod()
-    extractors['wordrank+sw'] = wordrank_method.WordRankMethod(stopWordsData = _stopWordsData)
-    extractors['wordrank+morfo+sw'] = wordrank_method.WordRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
-    extractors['wordrank+morfo:noun+sw'] = wordrank_method.WordRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
-    extractors['wordrank+morfo+thes+sw'] = wordrank_method.WordRankMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
-    extractors['wordrank+morfo+rel+sw'] = wordrank_method.WordRankMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['wordrank+morfo+thes+rel+sw'] = wordrank_method.WordRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['wordrank+morfo:nouns+thes+rel+sw'] = wordrank_method.WordRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
-    extractors['sentencerank'] = sentencerank_method.SentenceRankMethod()
-    extractors['sentencerank+sw'] = sentencerank_method.SentenceRankMethod(stopWordsData = _stopWordsData)
-    extractors['sentencerank+morfo+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
-    extractors['sentencerank+morfo:noun+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
-    extractors['sentencerank+morfo+thes+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
-    extractors['sentencerank+morfo+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['sentencerank+morfo+thes+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['sentencerank+morfo:nouns+thes+rel+sw'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
-    extractors['bipartial'] = bipartial_method.BipartialMethod()
-    extractors['bipartial+sw'] = bipartial_method.BipartialMethod(stopWordsData = _stopWordsData)
-    extractors['bipartial+morfo+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
-    extractors['bipartial+morfo:noun+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
-    extractors['bipartial+morfo+thes+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
-    extractors['bipartial+morfo+rel+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['bipartial+morfo+thes+rel+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
-    extractors['bipartial+morfo:nouns+thes+rel+sw'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
+    extractors['Rand0'] = random_method.RandomMethod()
+    extractors['Rand1'] = random_method.RandomMethod()
+    extractors['Rand2'] = random_method.RandomMethod()
+    extractors['Rand3'] = random_method.RandomMethod()
+    extractors['Rand4'] = random_method.RandomMethod()
+    extractors['Rand5'] = random_method.RandomMethod()
+    extractors['Rand6'] = random_method.RandomMethod()
+    extractors['Rand7'] = random_method.RandomMethod()
+    extractors['Rand8'] = random_method.RandomMethod()
+    extractors['Rand9'] = random_method.RandomMethod()
+    extractors['Ord'] = ordinal_method.OrdinalMethod()
+    extractors['StatS'] = statistic_method.StatisticMethod(stopWordsData = _stopWordsData)
+    extractors['StatSM'] = statistic_method.StatisticMethod(morfo = morfeusz, stopWordsData = _stopWordsData)
+    extractors['StatSM:n'] = statistic_method.StatisticMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
+    extractors['StatSMT'] = statistic_method.StatisticMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
+    extractors['StatSM:nTR'] = statistic_method.StatisticMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
+    extractors['Sent'] = sentencerank_method.SentenceRankMethod()
+    extractors['SentSM:n'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
+    extractors['SentSMT'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData)
+    extractors['SentSMTR'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['SentSM:nTR'] = sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
+    extractors['OrdSentSMTR3'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, d=0.3)
+    extractors['OrdSentSMTR5'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, d=0.5)
+    extractors['OrdSentSMTR7'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, d=0.7)
+    extractors['OrdSentSMTR9'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, d=0.9)
+    extractors['OrdSent5'] = alt_sentencerank_method.SentenceRankMethod(d=0.5)
+    extractors['OrdSentSM:n5'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos, d=0.5)
+    extractors['OrdSentSMT5'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, stopWordsData = _stopWordsData, d=0.5)
+    extractors['OrdSentSM:nTR5'] = alt_sentencerank_method.SentenceRankMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos, d=0.5)
+    extractors['MutS'] = bipartial_method.BipartialMethod(stopWordsData = _stopWordsData)
+    extractors['MutSM:n'] = bipartial_method.BipartialMethod(morfo = morfeusz, stopWordsData = _stopWordsData, pos = _pos)
+    extractors['MutSMTR'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData)
+    extractors['MutSM:nTR'] = bipartial_method.BipartialMethod(morfo = morfeusz, thesData = _thesData, relData = _relData, stopWordsData = _stopWordsData, pos=_pos)
     
 def prepare_automatic_rankings():
     for xt in extractors:
@@ -249,6 +314,25 @@ def sent_order(ranking):
         i += 1
     return res
 
+def count_false_positives():
+    for tid in relevant_sids:
+        relevant_set = set(relevant_sids[tid])
+        for method in extractors:
+            ar = (tid, method)
+            k = int(round(len(automatic_ranking[ar])/3.))
+            slist = getTopK(automatic_ranking[ar], k).keys()
+            false_positives[method] = false_positives.get(method, 0) + len(set(slist) - relevant_set)
+            false_positives_ratio[(tid, method)] = len(set(slist) - relevant_set) * 1. / k
+            
+def count_true_positives():
+    for tid in relevant_sids:
+        relevant_set = set(relevant_sids[tid])
+        for method in extractors:
+            ar = (tid, method)
+            k = int(round(len(automatic_ranking[ar])/3.))
+            slist = getTopK(automatic_ranking[ar], k).keys()
+            true_positives[method] = true_positives.get(method, 0) + len(set(slist).intersection(relevant_set))
+            true_positives_ratio[(tid, method)] = len(set(slist).intersection(relevant_set)) * 1. / k
 
 def prepare_position_diff():
     for ar in automatic_ranking:

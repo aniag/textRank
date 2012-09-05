@@ -104,6 +104,12 @@ def textXtStats(tid, xt):
         dist += pow((a-b), 2)
     distances[(tid, xt)]= math.sqrt(dist)
 
+def rank_extract(tid, xt):
+    res = 0
+    for i in selections[tid]:
+        res += rankings[(tid, xt)][i]
+    return res
+
 def prepareStatistics():
     for tid in texts:
         rankings[(tid, 'x-tractor')] = count_ref_ranking_for_text(tid)

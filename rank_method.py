@@ -8,7 +8,8 @@ import math
 
 class RankMethod(object):
 
-    def __init__(self, morfo = None, stopWordsData = None, thesData = None, relData = None, pos = None):
+    def __init__(self, morfo = None, stopWordsData = None, thesData = None, relData = None, pos = None, d = 0.05):
+        self._d = d
         self._use_morfo = False
         self._use_stopwords = False
         self._use_thes = False
@@ -102,8 +103,13 @@ class RankMethod(object):
         k = int(math.ceil(len(text.getSentences()) * 1./3))
         ranking = self.rankSentences(text)
         print ranking
+        print k
         pairs = ranking.items()
         pairs.sort(key=lambda v: v[1], reverse=True)
-        ranking = dict(pairs[:k])
-        for i in ranking:
+        pairs = pairs[:k]
+        ranking = dict(pairs)
+        tids = ranking.keys()
+        tids.sort()
+        print tids
+        for i in tids:
             print text.getSentence(i).getOriginalSentence()

@@ -1,6 +1,6 @@
 import evaluation as e
 e.load_texts('../logs/texts.json')
-e.load_xtracts('../logs/2012-06-27_0712-extracts.json')
+e.load_xtracts('../logs/2012-08-05_1202-extracts.json')
 e.prepare_single_xtracts()
 e.prepare_complement_rankings()
 e.prepare_avg_rankings()
@@ -12,10 +12,22 @@ e.prepare_conv_rms_errors()
 e.prepare_coocc_rates()
 e.prepare_familiada_scores()
 e.compare_xtracts_methods()
+e.count_false_positives()
+e.count_true_positives()
+
+
+
+
+
+
+
+
+
+''''
 p = e.cooccurence_rate.items()
 p.sort(key=lambda v : v[1])
 p
-
+'''
 '''
 p = e.method_cumulated_error.items()
 p.sort(key=lambda v : v[1])

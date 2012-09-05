@@ -4,7 +4,7 @@
 import rank_method
 import graph
 import vertex
-import pageRank
+import alt_pageRank as pageRank
 
 class SentenceRankMethod(rank_method.RankMethod):
 

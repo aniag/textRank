@@ -32,6 +32,7 @@ class BipartialHITS(object):
         for vrtx in self._AuthVertices:
             score = vrtx._score * 1. / norm
             vrtx.setScore(score)
+        norm = 0
         for vrtx in self._HubVertices:
             score = 0
             for neighbour in vrtx.getNeighbours():
